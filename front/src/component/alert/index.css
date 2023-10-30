@@ -1,0 +1,22 @@
+.alert {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 16px;
+  background-color: #f2883d1c;
+  color: #f2883d;
+  width: 353px;
+}
+
+.alert-message {
+  font-size: 14px;
+}
+
+.alert-icon {
+  width: 16px;
+  height: 16px;
+}

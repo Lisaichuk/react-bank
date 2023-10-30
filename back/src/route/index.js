@@ -2,17 +2,25 @@
 const express = require('express')
 const router = express.Router()
 
-// Підключіть файли роутів
-// const test = require('./test')
-// Підключіть інші файли роутів, якщо є
+const { User } = require('../class/user')
 
-// Об'єднайте файли роутів за потреби
-// router.use('/', test)
-// Використовуйте інші файли роутів, якщо є
+// ================================================================
 
 router.get('/', (req, res) => {
-  res.status(200).json('Hello World')
+  const users = User.getList()
+  res.json(users)
 })
+
+// ================================================================
+
+// Підключіть файли роутів
+const user = require('./user')
+// Підключіть інші файли роутів, якщо є
+// const user = require('./user')
+
+// Об'єднайте файли роутів за потреби
+router.use('/', user)
+// Використовуйте інші файли роутів, якщо є
 
 // Експортуємо глобальний роутер
 module.exports = router

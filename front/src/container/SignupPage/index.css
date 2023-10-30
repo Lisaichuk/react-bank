@@ -1,0 +1,16 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.link-prefix {
+  font-size: 14px;
+  color: #1d1d1f;
+}
+
+.link {
+  color: #775ce5;
+}
