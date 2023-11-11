@@ -1,16 +1,21 @@
 import React, { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../component/authRoute";
+import { useNavigate } from "react-router-dom";
 import "./index.css";
 
+import { Page } from "../../component/page";
 import Header from "../../component/header";
 import Field from "../../component/field";
 import Button from "../../component/button";
 
 const SettingsPage: React.FC = () => {
-  const { dispatch } = useAuth();
+  const navigate = useNavigate();
+  const { state, dispatch } = useAuth();
+
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
   const handleChangeEmail = async (email: string) => {
     // try {
     //   const response = await fetch("/settings", {
@@ -34,6 +39,7 @@ const SettingsPage: React.FC = () => {
   const handleEmailButtonClick = () => {
     handleChangeEmail(email);
   };
+
   const handleChangePassword = async (newPassword: string) => {
     // try {
     //   const response = await fetch("/settings", {
@@ -53,33 +59,38 @@ const SettingsPage: React.FC = () => {
     //   alert("Failed to change password");
     // }
   };
+
   const handlePasswordButtonClick = () => {
     handleChangePassword(newPassword);
   };
+
   const handleLogout = async () => {
     try {
-      const response = await fetch("/settings", {
+      const res = await fetch("http://localhost:4000/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ token: state.token }),
       });
-      if (!response.ok) {
-        throw new Error("Failed to log out");
+
+      const data = await res.json();
+
+      if (res.ok) {
+        dispatch({ type: "LOGOUT" });
+        navigate("/");
       }
-      dispatch({ type: "LOGOUT" });
-      alert("Logged out successfully");
     } catch (error) {
       console.error("Error logging out:", error);
-      alert("Failed to log out");
     }
   };
+
   return (
-    <div>
-      <Header pageName="Settings" />
-      <div className="change__block">
-        <h2 className="settings__title">Change email</h2>
-        {email && (
+    <Page>
+      <React.Fragment>
+        <Header pageName="Settings" />
+        <div className="change__block">
+          <h2 className="settings__title">Change email</h2>
           <Field
             label="Email"
             type="email"
@@ -87,8 +98,6 @@ const SettingsPage: React.FC = () => {
             placeholder="Enter your new email"
             onChange={setEmail}
           />
-        )}
-        {oldPassword && (
           <Field
             label="Old Password"
             type="password"
@@ -96,15 +105,13 @@ const SettingsPage: React.FC = () => {
             placeholder="Enter your old password"
             onChange={setOldPassword}
           />
-        )}
-        <Button
-          text="Save Email"
-          className="button--secondary"
-          onClick={handleEmailButtonClick}
-        />
-        <hr className="divider" />
-        <h2 className="settings__title">Change password</h2>
-        {oldPassword && (
+          <Button
+            text="Save Email"
+            className="button--secondary"
+            onClick={handleEmailButtonClick}
+          />
+          <hr className="divider" />
+          <h2 className="settings__title">Change password</h2>
           <Field
             label="Old Password"
             type="password"
@@ -112,8 +119,6 @@ const SettingsPage: React.FC = () => {
             placeholder="Enter your old password"
             onChange={setOldPassword}
           />
-        )}
-        {newPassword && (
           <Field
             label="New Password"
             type="password"
@@ -121,20 +126,20 @@ const SettingsPage: React.FC = () => {
             placeholder="Enter your new password"
             onChange={setNewPassword}
           />
-        )}
-        <Button
-          text="Save Password"
-          className="button--secondary"
-          onClick={handlePasswordButtonClick}
-        />
-        <hr className="divider" />
-        <Button
-          text="Log Out"
-          className="button--danger"
-          onClick={handleLogout}
-        />
-      </div>
-    </div>
+          <Button
+            text="Save Password"
+            className="button--secondary"
+            onClick={handlePasswordButtonClick}
+          />
+          <hr className="divider" />
+          <Button
+            text="Log Out"
+            className="button--danger"
+            onClick={handleLogout}
+          />
+        </div>
+      </React.Fragment>
+    </Page>
   );
 };
 

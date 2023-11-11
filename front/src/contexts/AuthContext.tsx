@@ -1,15 +1,24 @@
-import React, { useReducer, createContext, useContext, ReactNode } from "react";
+import React, { useReducer, createContext, useEffect } from "react";
 
-const initialState = {
+const currentTime = new Date().getTime();
+const authStateFromLocalStorage = JSON.parse(
+  localStorage.getItem("authState") || "null"
+);
+// const authStateFromLocalStorageStr = localStorage.getItem("authState");
+// const authStateFromLocalStorage = authStateFromLocalStorageStr
+//   ? JSON.parse(authStateFromLocalStorageStr)
+//   : null;
+
+const initialState = authStateFromLocalStorage || {
   token: null as string | null,
   user: null as any,
-  isLogged: false as boolean | undefined,
+  expirationTime: currentTime + 60 * 60 * 1000,
 };
 
 type State = typeof initialState;
 
 type Action =
-  | { type: "LOGIN"; payload: { token: string; user: any; isLogged?: boolean } }
+  | { type: "LOGIN"; payload: { token: string; user: any } }
   | { type: "LOGOUT" };
 
 export const AuthContext = createContext<
@@ -23,7 +32,6 @@ function authReducer(state: State, action: Action): State {
         ...state,
         token: action.payload.token,
         user: action.payload.user,
-        // isLogged: action.payload.isLogged,
       };
     case "LOGOUT":
       return initialState;
@@ -33,23 +41,37 @@ function authReducer(state: State, action: Action): State {
 }
 
 interface AuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+
+  useEffect(() => {
+    const savedState = localStorage.getItem("authState");
+
+    if (savedState) {
+      const parsedState = JSON.parse(savedState);
+      const currentTime = new Date().getTime();
+
+      if (currentTime >= parsedState.expirationTime) {
+        dispatch({ type: "LOGOUT" });
+        localStorage.removeItem("authState");
+      } else {
+        dispatch({
+          type: "LOGIN",
+          payload: {
+            token: parsedState.token,
+            user: parsedState.user,
+          },
+        });
+      }
+    }
+  }, [dispatch]);
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth повинен використовуватися в межах AuthProvider");
-  }
-  return context;
 };

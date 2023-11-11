@@ -7,18 +7,18 @@ class Confirm {
   }
 
   static generateCode = () => {
-    return Math.floor(Math.random() * 9000) + 1000
+    return Math.floor(Math.random() * 9000) + 100000
   }
 
   static create = (data) => {
     const confirmation = new Confirm(data)
     this.#list.push(confirmation)
 
-    setTimeout(() => {
-      this.delete(confirmation.code)
-    }, 24 * 60 * 60 * 1000) // 24 години у мілісекундах
+    // setTimeout(() => {
+    //   this.delete(confirmation.code)
+    // }, 24 * 60 * 60 * 1000) // видалити через 24 години у мілісекундах
 
-    console.log('Code:', this.#list)
+    console.log(this.#list)
   }
 
   static delete = (code) => {

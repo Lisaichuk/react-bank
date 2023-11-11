@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../component/authRoute";
 import "./index.css";
 
+import { Page } from "../../component/page";
 import BackButton from "../../component/backButton";
 import Heading from "../../component/heading";
 import Field from "../../component/field";
@@ -11,18 +12,20 @@ import Alert from "../../component/alert";
 
 function RecoveryConfirmPage(): React.ReactElement {
   const navigate = useNavigate();
-  const { state, dispatch } = useAuth();
+  const { state } = useAuth();
   const token = state.token;
 
   const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [emptyFields, setEmptyFields] = useState(false);
-  const [error, setError] = useState("");
+  const [isValid, setIsValid] = useState(false);
 
   const handleCodeChange = (value: string, isValid: boolean) => {
     setCode(value);
     setEmptyFields(false);
+    setIsValid(isValid);
   };
 
   const handlePasswordChange = (value: string, isValid: boolean) => {
@@ -32,14 +35,18 @@ function RecoveryConfirmPage(): React.ReactElement {
   };
 
   const handleRecoveryConfirm = async () => {
-    if (code === "" || password === "") {
+    if (code.trim() === "" || password.trim() === "") {
       setEmptyFields(true);
       return;
-    } else if (passwordError) {
+    } else if (codeError || passwordError) {
       return;
     }
 
     try {
+      console.log("code:", code);
+      console.log("password:", password);
+      console.log("token:", token);
+
       const res = await fetch("http://localhost:4000/recovery-confirm", {
         method: "POST",
         headers: {
@@ -52,22 +59,13 @@ function RecoveryConfirmPage(): React.ReactElement {
         }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        dispatch({
-          type: "LOGIN",
-          payload: {
-            token: data.token,
-            user: data.user,
-            isLogged: data.isLogged,
-          },
-        });
+      const data = await res.json();
 
+      if (res.ok) {
         setEmptyFields(false);
         navigate("/balance");
       } else {
-        const errorData = await res.json();
-        setError(errorData.message);
+        setCodeError(data.message);
       }
     } catch (err) {
       console.error(err);
@@ -75,38 +73,42 @@ function RecoveryConfirmPage(): React.ReactElement {
   };
 
   return (
-    <React.Fragment>
-      <BackButton />
-      <Heading
-        title="Recover password"
-        subtitle="Write the code you received"
-      />
-
-      <form className="form">
-        <Field
-          label="Code"
-          type="code"
-          name="code"
-          placeholder="Enter your code"
-          onChange={handleCodeChange}
-        />
-        <Field
-          label="New password"
-          type="password"
-          name="password"
-          placeholder="Enter your new password"
-          onChange={handlePasswordChange}
-        />
-        <Button
-          onClick={handleRecoveryConfirm}
-          text="Restore password"
-          className="button--primary"
+    <Page>
+      <React.Fragment>
+        <BackButton />
+        <Heading
+          title="Recover password"
+          subtitle="Write the code you received"
         />
 
-        {emptyFields && <Alert text={"Please fill in all the fields"} />}
-        {error && <Alert text={error} />}
-      </form>
-    </React.Fragment>
+        <form className="form">
+          <Field
+            label="Code"
+            type="number"
+            name="code"
+            placeholder="Enter your code"
+            onChange={handleCodeChange}
+          />
+          <Field
+            label="New password"
+            type="password"
+            name="password"
+            formType="signUp"
+            placeholder="Enter your new password"
+            onChange={handlePasswordChange}
+          />
+          <Button
+            onClick={handleRecoveryConfirm}
+            text="Restore password"
+            className="button--primary"
+            disabled={!isValid || passwordError || Boolean(!password)}
+          />
+
+          {emptyFields && <Alert text={"Please fill in all the fields"} />}
+          {codeError && <Alert text={codeError} />}
+        </form>
+      </React.Fragment>
+    </Page>
   );
 }
 

@@ -1,18 +1,18 @@
 import React from "react";
 import "./index.css";
 
-interface ButtonProps {
-  text?: string;
+interface ButtonIconProps {
+  src: string;
+  alt: string;
   className?: string;
   onClick?: () => void;
-  disabled?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({
-  text,
+const ButtonIcons: React.FC<ButtonIconProps> = ({
+  src,
+  alt,
   className,
   onClick,
-  disabled,
 }) => {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (onClick) {
@@ -22,14 +22,10 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={disabled}
-      className={`button ${className}`}
-    >
-      {text}
+    <button onClick={handleClick} className={`button__icon ${className}`}>
+      <img src={src} alt={alt} />
     </button>
   );
 };
 
-export default Button;
+export default ButtonIcons;

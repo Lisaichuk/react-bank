@@ -1,18 +1,28 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useContext } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
+import BalancePage from "../../container/BalancePage";
 
 interface AuthRouteProps {
   children: React.ReactElement;
 }
 
-const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
-  const { state } = useAuth();
+export const useAuth = () => {
+  const context = useContext(AuthContext);
 
-  if (state.token) {
-    return <Navigate to="/balance" replace />;
-  } else {
-    return children;
+  if (!context) {
+    throw new Error("useAuth must be used inside Auth Provider");
   }
+
+  return context;
 };
 
-export default AuthRoute;
+export const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
+  const { state } = useAuth();
+  console.log(state);
+
+  if (state.token && state.user.isConfirm) {
+    return <BalancePage />;
+  } else {
+    return <>{children}</>;
+  }
+};

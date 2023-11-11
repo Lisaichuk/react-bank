@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import "./index.css";
 
+import { Page } from "../../component/page";
 import Header from "../../component/header";
 import Field from "../../component/field";
 import Button from "../../component/button";
@@ -48,31 +49,33 @@ const SendPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <Header pageName="Send" />
+    <Page>
+      <React.Fragment>
+        <Header pageName="Send" />
 
-      <div className="content-block">
-        <Field
-          label="Email"
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          //   onChange={handleInputChange}
-        />
-        <Field
-          label="Sum"
-          type="sum"
-          name="sum"
-          placeholder="$"
-          //   onChange={handleInputChange}
-        />
-        <Button
-          onClick={handleSendMoney}
-          text="Send"
-          className="button--primary"
-        />
-      </div>
-    </div>
+        <div className="content-block">
+          <Field
+            label="Email"
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            //   onChange={handleInputChange}
+          />
+          <Field
+            label="Sum"
+            type="sum"
+            name="sum"
+            placeholder="$"
+            //   onChange={handleInputChange}
+          />
+          <Button
+            onClick={handleSendMoney}
+            text="Send"
+            className="button--primary"
+          />
+        </div>
+      </React.Fragment>
+    </Page>
   );
 };
 

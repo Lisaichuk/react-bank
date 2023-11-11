@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../component/authRoute";
 
 import "./index.css";
 
+import { Page } from "../../component/page";
 import BackButton from "../../component/backButton";
 import Heading from "../../component/heading";
 import Field from "../../component/field";
@@ -12,24 +13,31 @@ import Alert from "../../component/alert";
 
 function RecoveryPage(): React.ReactElement {
   const navigate = useNavigate();
-  const { dispatch } = useAuth();
+  const { state } = useAuth();
+  const token = state.token;
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [emptyFields, setEmptyFields] = useState(false);
-  const [userNotExist, setUserNotExist] = useState(false);
-  const [userNotExistText, setUserNotExistText] = useState("");
+  const [error, setError] = useState(false);
+  const [errorText, setErrorText] = useState("");
 
   const handleEmailChange = (value: string, isValid: boolean) => {
     setEmail(value);
     setEmptyFields(false);
     setEmailError(!isValid);
-    setUserNotExist(false);
-    setUserNotExistText("");
+    setError(false);
+    setErrorText("");
   };
 
+  const errorAuthComponent = (
+    <Link className="link" to={"/signup"}>
+      Please sign up
+    </Link>
+  );
+
   const handleRecovery = async () => {
-    if (email === "") {
+    if (email.trim() === "") {
       setEmptyFields(true);
       return;
     } else if (emailError) {
@@ -37,32 +45,37 @@ function RecoveryPage(): React.ReactElement {
     }
 
     try {
+      console.log(email);
+      console.log(token);
+
       const res = await fetch("http://localhost:4000/recovery", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: email }),
+        body: JSON.stringify({
+          email: email,
+          token: token,
+        }),
       });
 
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
-        console.log(data);
-
-        dispatch({
-          type: "LOGIN",
-          payload: {
+        localStorage.setItem(
+          "authState",
+          JSON.stringify({
+            email: data.email,
             token: data.token,
-            user: data.user,
-          },
-        });
+          })
+        );
 
         setEmptyFields(false);
+        setError(false);
+        setErrorText("This email address does not exist");
         navigate("/recovery-confirm");
       } else {
-        const errorData = await res.json();
-        setUserNotExist(true);
-        setUserNotExistText(errorData.message);
+        setError(true);
+        setErrorText(data.message);
       }
     } catch (err) {
       console.error(err);
@@ -70,28 +83,35 @@ function RecoveryPage(): React.ReactElement {
   };
 
   return (
-    <React.Fragment>
-      <BackButton />
-      <Heading title="Recover password" subtitle="Choose a recovery method" />
+    <Page>
+      <React.Fragment>
+        <BackButton />
+        <Heading title="Recover password" subtitle="Choose a recovery method" />
 
-      <form className="form">
-        <Field
-          label="Email"
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          onChange={handleEmailChange}
-        />
-        <Button
-          onClick={handleRecovery}
-          text="Send code"
-          className="button--primary"
-        />
+        <form className="form">
+          <Field
+            label="Email"
+            type="email"
+            name="email"
+            formType="signIn"
+            placeholder="Enter your email"
+            onChange={handleEmailChange}
+          />
+          <Button
+            onClick={handleRecovery}
+            text="Send code"
+            className="button--primary"
+            disabled={emailError || Boolean(!email)}
+          />
 
-        {userNotExist && <Alert text={userNotExistText} />}
-        {emptyFields && <Alert text={"Please fill in all the fields"} />}
-      </form>
-    </React.Fragment>
+          {error && <Alert text={errorText} />}
+          {errorText.includes("This email address does not exist") && (
+            <div>{errorAuthComponent}</div>
+          )}
+          {emptyFields && <Alert text={"Please fill in all the fields"} />}
+        </form>
+      </React.Fragment>
+    </Page>
   );
 }
 

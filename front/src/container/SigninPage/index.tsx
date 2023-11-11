@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../component/authRoute";
 import "./index.css";
 
+import { Page } from "../../component/page";
 import BackButton from "../../component/backButton";
 import Heading from "../../component/heading";
 import Field from "../../component/field";
@@ -11,7 +12,8 @@ import Alert from "../../component/alert";
 
 function SigninPage(): React.ReactElement {
   const navigate = useNavigate();
-  const { dispatch } = useAuth();
+  const { dispatch, state } = useAuth();
+  const token = state.token;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,23 +23,28 @@ function SigninPage(): React.ReactElement {
   const [userNotExist, setUserNotExist] = useState(false);
   const [userNotExistText, setUserNotExistText] = useState("");
 
+  const errorAuthComponent = (
+    <Link className="link" to={"/signup-confirm"}>
+      Confirm email
+    </Link>
+  );
+
   const handleEmailChange = (value: string, isValid: boolean) => {
     setEmail(value);
-    setEmptyFields(false);
     setEmailError(!isValid);
+    setEmptyFields(false);
     setUserNotExist(false);
-    setUserNotExistText("");
   };
 
   const handlePasswordChange = (value: string, isValid: boolean) => {
     setPassword(value);
-    setEmptyFields(false);
     setPasswordError(!isValid);
-    setUserNotExistText("");
+    setEmptyFields(false);
+    setUserNotExist(false);
   };
 
   const handleSignin = async () => {
-    if (email === "" || password === "") {
+    if (email.trim() === "" || password.trim() === "") {
       setEmptyFields(true);
       return;
     } else if (emailError || passwordError) {
@@ -53,11 +60,21 @@ function SigninPage(): React.ReactElement {
         body: JSON.stringify({
           email: email,
           password: password,
+          token: token,
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        const data = await res.json();
+        localStorage.setItem(
+          "authState",
+          JSON.stringify({
+            token: data.token,
+            user: data.user,
+          })
+        );
+
         dispatch({
           type: "LOGIN",
           payload: {
@@ -65,14 +82,14 @@ function SigninPage(): React.ReactElement {
             user: data.user,
           },
         });
+
+        setEmptyFields(false);
         setUserNotExist(false);
-        setUserNotExistText("");
+        setUserNotExistText("Your email has not been confirmed");
         navigate("/balance");
       } else {
-        const errorData = await res.json();
         setUserNotExist(true);
-        setUserNotExistText(errorData.message);
-        navigate("/signup-confirm");
+        setUserNotExistText(data.message);
       }
     } catch (err) {
       console.error(err);
@@ -80,45 +97,56 @@ function SigninPage(): React.ReactElement {
   };
 
   return (
-    <React.Fragment>
-      <BackButton />
-      <Heading title="Sign In" subtitle="Select login method" />
+    <Page>
+      <React.Fragment>
+        <BackButton />
+        <Heading title="Sign In" subtitle="Select login method" />
 
-      <form className="form">
-        <Field
-          label={"Email"}
-          type={"email"}
-          name={"email"}
-          placeholder={"Enter your email"}
-          formType="signIn"
-          onChange={handleEmailChange}
-        />
-        <Field
-          label={"Password"}
-          type={"password"}
-          name={"password"}
-          placeholder={"Enter your password"}
-          formType="signIn"
-          onChange={handlePasswordChange}
-        />
+        <form className="form">
+          <Field
+            label={"Email"}
+            type={"email"}
+            name={"email"}
+            placeholder={"Enter your email"}
+            formType="signIn"
+            onChange={handleEmailChange}
+          />
+          <Field
+            label={"Password"}
+            type={"password"}
+            name={"password"}
+            placeholder={"Enter your password"}
+            formType="signIn"
+            onChange={handlePasswordChange}
+          />
 
-        <div className="link-prefix">
-          Forgot your password?{" "}
-          <Link to={"/recovery"} className="link">
-            Restore
-          </Link>
-        </div>
+          <div className="link-prefix">
+            Forgot your password?{" "}
+            <Link to={"/recovery"} className="link">
+              Restore
+            </Link>
+          </div>
 
-        <Button
-          onClick={handleSignin}
-          text="Continue"
-          className="button--primary"
-        />
+          <Button
+            onClick={handleSignin}
+            text="Continue"
+            className="button--primary"
+            disabled={
+              emailError ||
+              passwordError ||
+              Boolean(!password) ||
+              Boolean(!email)
+            }
+          />
+        </form>
 
-        {userNotExist && <Alert text={userNotExistText} />}
         {emptyFields && <Alert text={"Please fill in all the fields"} />}
-      </form>
-    </React.Fragment>
+        {userNotExist && <Alert text={userNotExistText} />}
+        {userNotExistText.includes("Your email has not been confirmed") && (
+          <div>{errorAuthComponent}</div>
+        )}
+      </React.Fragment>
+    </Page>
   );
 }
 

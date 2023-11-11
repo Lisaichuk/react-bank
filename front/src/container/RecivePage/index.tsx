@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import "./index.css";
 
+import { Page } from "../../component/page";
 import BackButton from "../../component/backButton";
 import Heading from "../../component/heading";
 import Field from "../../component/field";
@@ -40,25 +41,27 @@ const RecivePage: React.FC = () => {
   };
 
   return (
-    <div>
-      <BackButton />
-      <Heading title="Recover password" subtitle="Choose a recovery method" />
+    <Page>
+      <React.Fragment>
+        <BackButton />
+        <Heading title="Recover password" subtitle="Choose a recovery method" />
 
-      <div className="content-block">
-        <Field
-          label="Email"
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          //   onChange={handleInputChange}
-        />
-        <Button
-          onClick={handleSendCode}
-          text="Send code"
-          className="button--primary"
-        />
-      </div>
-    </div>
+        <div className="content-block">
+          <Field
+            label="Email"
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            //   onChange={handleInputChange}
+          />
+          <Button
+            onClick={handleSendCode}
+            text="Send code"
+            className="button--primary"
+          />
+        </div>
+      </React.Fragment>
+    </Page>
   );
 };
 
