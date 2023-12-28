@@ -1,0 +1,32 @@
+.sum {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+
+  font-size: 16px;
+  color: #000;
+}
+
+.sum--main {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.sum--second {
+  font-weight: 400;
+  color: gray;
+}
+
+.sum--white {
+  color: white;
+}
+
+.sum--green {
+  color: green;
+}
+
+.sum--red {
+  color: red;
+}

@@ -1,0 +1,20 @@
+.change__block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin-top: 32px;
+  padding: 0 20px;
+}
+
+.settings__title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000;
+}
+
+.divider {
+  border: 1px solid #e9e8eb;
+  padding-inline: 20px;
+  width: 87%;
+}

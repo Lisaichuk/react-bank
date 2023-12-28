@@ -1,0 +1,141 @@
+.balance__page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.header__block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 201px;
+    width: 393px;
+    background-image: url("../../img/balance-bg.svg");
+    border-radius: 24px 24px 0 0;
+    color: #fff;
+}
+
+.header__action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-top: 60px;
+    padding-inline: 20px;
+}
+
+.settings-icon,
+.notification-icon {
+    background: none;
+    border: none;
+    width: 24px;
+    height: 24px;
+}
+
+.header__title {
+    font-size: 16px;
+}
+
+.sum {
+    display: flex;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.transfer__block {
+    position: absolute;
+    top: 175px;
+    right: 114px;
+    display: flex;
+    gap: 12px;
+}
+
+.transaction-type {
+    color: gray;
+    font-size: 13px;
+}
+
+.transaction-amount {
+    justify-self: end;
+}
+
+.transfer-receive,
+.transfer-send {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.transfer-title {
+    font-size: 14px;
+    color: #1d1d1f;
+}
+
+.transactions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 72px;
+    padding: 0 20px;
+}
+.transaction-nav{
+    text-decoration: none;
+    padding: 0;
+    margin: 0;
+}
+.card-notification {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #ffffff;
+    padding: 10px 4px ;
+    border-radius: 12px;
+    justify-content: space-between;
+    cursor: pointer;
+
+}
+
+.transaction-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon {
+    width: 48px;
+    height: 48px;
+}
+
+.transaction-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.transaction-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1d1d1f;
+}
+
+.subtitle__block {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.transaction-subtitle {
+    font-size: 12px;
+    color: #939199;
+}
+
+.dot {
+    content: "";
+    display: block;
+    width: 2px;
+    height: 2px;
+    background-color: #939199;
+    border-radius: 50%;
+}
